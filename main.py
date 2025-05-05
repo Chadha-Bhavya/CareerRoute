@@ -1,7 +1,7 @@
 import streamlit as st
 from roadmap_generator import generate_skill_list, generate_resources_for_skill
 from resource_fetcher import get_youtube_links
-
+from github_fetcher import get_github_projects
 from fpdf import FPDF
 import markdown
 import base64
@@ -53,10 +53,13 @@ if st.button("Generate Full Roadmap"):
                 with st.spinner(f"Finding resources and projects for: {skill}"):
                     output = generate_resources_for_skill(skill)
                     links = get_youtube_links(skill)
+                    github_links = get_github_projects(skill)
 
                     skill_outputs[skill] = (
                         f"{output}\n\n### 📺 YouTube Tutorials:\n"
                         + "\n".join([f"- [{link}]({link})" for link in links])
+                        + "\n\n### 🧑‍💻 GitHub Projects:\n"
+                        + "\n".join(github_links)
                     )
 
                     st.markdown(output)
@@ -64,6 +67,9 @@ if st.button("Generate Full Roadmap"):
                     for link in links:
                         st.markdown(f"- [{link}]({link})")
 
+                    st.markdown("**🧑‍💻 GitHub Projects:**")
+                    for repo in github_links:
+                        st.markdown(repo)
 
             # Export
             md = generate_markdown(goal, skill_outputs)
